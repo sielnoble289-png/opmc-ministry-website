@@ -725,7 +725,7 @@ MAINTAINER NOTES (CODE ONLY — NEVER DISPLAY ON THE PUBLIC PAGE):
         </div>
       </div>
       <div class="live-player-caption">
-        <span>OMEGA PRAISE AND MIRACLE CENTER</span>
+        <span>OMEGA PRAISE AND MIRACLE CENTRE</span>
         <span>Live worship · Prayer · The Word</span>
       </div>
 
@@ -749,7 +749,7 @@ MAINTAINER NOTES (CODE ONLY — NEVER DISPLAY ON THE PUBLIC PAGE):
         <p class="direct-stream-description">Tip: YouTube Live can be watched on this page, but mobile broadcasting may be limited by YouTube channel eligibility. The mobile app generally requires at least 50 subscribers, channel verification, live streaming enabled, and no recent live-stream restrictions. Channels below 1,000 subscribers may have mobile audience limits.</p>
       </div>
 
-      <div id="opmcFb" hidden><div class="section-kicker">Facebook Live</div><iframe id="opmcFbPlayer" title="OPMC Facebook Live" src="about:blank" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe></div>
+      <div id="opmcFb" hidden><div class="section-kicker">Facebook Live</div><iframe id="opmcFbPlayer" title="OPMC Facebook Live" src="about:blank" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe><p style="margin:10px 0 0;font-size:13px"><a id="opmcFbLink" href="#" target="_blank" rel="noopener" style="color:var(--gold-light)">Can’t see the video? Watch on Facebook ↗</a></p></div>
 
       <div id="opmcGiving" hidden><h4>GIVE · TITHES, OFFERINGS &amp; DONATIONS <span style="opacity:.6">(tap an account to copy)</span></h4><div class="og-w"><div class="og-t" id="opmcGivingTrack"></div></div></div>
 
@@ -1587,12 +1587,13 @@ if(LS.opmc_sub){if(confirm('Turn off notifications on this device?')){try{const 
 if(await Notification.requestPermission()!=='granted'){alert('Notifications are blocked. Allow them in your browser site settings, then tap Subscribe again.');return}
 try{if('serviceWorker'in navigator&&'PushManager'in window&&!VAPID.startsWith('PASTE')){await navigator.serviceWorker.register('sw.js');const r=await navigator.serviceWorker.ready,p=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID)});await fetch(B+'push_subscriptions?on_conflict=endpoint',{method:'POST',headers:{...H,'Content-Type':'application/json',Prefer:'resolution=ignore-duplicates,return=minimal'},body:JSON.stringify({endpoint:p.endpoint,subscription:p.toJSON()})})}}catch(x){console.warn('Push setup:',x)}
 LS.opmc_sub='1';label();await watch();show('Subscribed ✓','You will be notified about new events and live services.','opmc-sub','/')});
+const nfb=u=>{try{const x=new URL(String(u).replace(/^(https?:\/\/)(?:m|web|mbasic|touch)\.facebook\.com/i,'$1www.facebook.com'));if(/^\/watch/.test(x.pathname)){const v=x.searchParams.get('v');return x.origin+'/watch/'+(v?'?v='+v:'')}return x.origin+x.pathname}catch(e){return u}};
 async function yt(){let s={},m=null;try{const r=await fetch(U+'/functions/v1/youtube-live',{method:'POST',headers:{...H,'Content-Type':'application/json'},body:'{}'});if(r.ok)s=await r.json()}catch(e){}try{[m]=await get('facebook_live?select=url,is_live&id=eq.1')}catch(e){}
 try{const f=$('youtubeLivePlayer'),sc=$('livePlayerScreen'),st=$('youtubeSetupStatus'),fb=s.fb||{},fw=$('opmcFb'),ff=$('opmcFbPlayer'),yl=!!(s.configured&&s.is_live&&s.video_id),fbu=(m&&m.is_live&&m.url)||(fb.is_live&&fb.url)||'',fl=!!fbu;
 if(yl){if(!f.src.includes(s.video_id))f.src='https://www.youtube-nocookie.com/embed/'+s.video_id+'?autoplay=1&mute=1';f.hidden=false;if(st)st.textContent='OPMC is live now'+(s.title?' — '+s.title:'')}else if(s.configured&&!f.hidden){f.src='about:blank';f.hidden=true;if(st)st.textContent='No live service right now.'}
-if(fl){const u='https://www.facebook.com/plugins/video.php?show_text=false&autoplay=true&href='+encodeURIComponent(fbu);if(ff.dataset.u!==u){ff.src=u;ff.dataset.u=u}fw.hidden=false}else if(!fw.hidden){ff.src='about:blank';ff.dataset.u='';fw.hidden=true}
+if(fl){const u='https://www.facebook.com/plugins/video.php?show_text=false&autoplay=true&href='+encodeURIComponent(nfb(fbu));if(ff.dataset.u!==u){ff.src=u;ff.dataset.u=u}$('opmcFbLink').href=/^https?:\/\//.test(fbu)?fbu:'#';fw.hidden=false}else if(!fw.hidden){ff.src='about:blank';ff.dataset.u='';fw.hidden=true}
 if(sc)sc.hidden=yl||fl||!f.hidden;await giving()}catch(e){}}
-async function vids(){try{const r=await get('church_videos?select=title,description,video_url,kind&order=created_at.desc&limit=24');if(!r.length)return;$('opmcVideoGrid').innerHTML=r.map(v=>{if(!/^https:/.test(v.video_url))return'';const m=v.kind==='youtube'&&v.video_url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/);const media=m?`<iframe src="https://www.youtube-nocookie.com/embed/${m[1]}" title="${esc(v.title)}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`:v.kind==='facebook'?`<iframe src="https://www.facebook.com/plugins/video.php?show_text=false&href=${encodeURIComponent(v.video_url)}" title="${esc(v.title)}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`:`<video controls preload="metadata" playsinline src="${esc(v.video_url)}"></video>`;return`<article class="ov-card">${media}<div><h4>${esc(v.title)}</h4>${v.description?'<p>'+esc(v.description)+'</p>':''}</div></article>`}).join('')}catch(e){}}
+async function vids(){try{const r=await get('church_videos?select=title,description,video_url,kind&order=created_at.desc&limit=24');if(!r.length)return;$('opmcVideoGrid').innerHTML=r.map(v=>{if(!/^https:/.test(v.video_url))return'';const m=v.kind==='youtube'&&v.video_url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/);const media=m?`<iframe src="https://www.youtube-nocookie.com/embed/${m[1]}" title="${esc(v.title)}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`:v.kind==='facebook'?`<iframe src="https://www.facebook.com/plugins/video.php?show_text=false&href=${encodeURIComponent(nfb(v.video_url))}" title="${esc(v.title)}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`:`<video controls preload="metadata" playsinline src="${esc(v.video_url)}"></video>`;return`<article class="ov-card">${media}<div><h4>${esc(v.title)}</h4>${v.description?'<p>'+esc(v.description)+'</p>':''}${v.kind==='facebook'?'<p><a href="'+esc(v.video_url)+'" target="_blank" rel="noopener" style="color:#d8b45a">Watch on Facebook ↗</a></p>':''}</div></article>`}).join('')}catch(e){}}
 label();yt();giving();tList();vids();watch();setInterval(()=>{yt();watch()},45000);
 })();
 </script>
